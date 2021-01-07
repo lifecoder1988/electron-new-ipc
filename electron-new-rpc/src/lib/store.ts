@@ -1,0 +1,15 @@
+import Store from 'electron-store';
+
+class GlobalStore {
+  static store = new Store() 
+
+  static  get(host:string): any {
+    return GlobalStore.store.get(host)
+  }
+
+  static set(host:string,info:any) {
+    return GlobalStore.store.set(host,info)
+  }
+
+}
+export default GlobalStore
