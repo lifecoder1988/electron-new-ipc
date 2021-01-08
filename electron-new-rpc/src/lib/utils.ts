@@ -8,13 +8,14 @@ interface Process {
 }
 declare var process: Process
 
-console.log(process)
+//console.log(process)
 
 export function getSender(hostId: number) {
   if(isRenderer()) {
     //import { BrowserWindow, ipcMain, ipcRenderer } from 'electron';
     return electron.ipcRenderer
   } else {
+    console.log(electron.BrowserWindow.fromId(hostId))
     return electron.BrowserWindow.fromId(hostId)?.webContents
   }
 }

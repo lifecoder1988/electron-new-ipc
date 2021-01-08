@@ -29,13 +29,19 @@ class Protocol extends EventEmitter {
   private init() {
 
     this.on(CONST.REQUEST_MSG,(request) => {
+      console.log("on Request Event")
+      console.log(request)
+
       const service = this.serviceMap[request.serviceName]
+      console.log(this.serviceMap)
+      
       console.log(service)
       service.handleRequest(request)
       
     })
 
     this.on(CONST.RESPONSE_MSG,(response) => {
+      console.log("on Response Event")
       console.log(response)
       const ins = this.requestMap[response.request.id]
       clearTimeout(ins.timer)
@@ -44,14 +50,25 @@ class Protocol extends EventEmitter {
     })
 
     if(utils.isRenderer()) {
-      utils.getIPC().on(CONST.RPC_MSG , (data:any) => {
+      console.error("in render ipc on ...")
+      utils.getIPC().on(CONST.RPC_MSG , (_,data:any) => {
+       
+        console.log(data)
         this.dispatch(data)
       })
+
+      const hostId = require('electron').remote.getCurrentWindow().id
+      this.setHostId(utils.currentHost(),hostId)
+
     } else {
-      utils.getIPC().on(CONST.RPC_MSG , (data:any) => {
+      utils.getIPC().on(CONST.RPC_MSG , (_,data:any) => {
+        console.log("in main ipc on ...")
+        console.log(data)
         this.dispatch(data)
       })
     }
+    
+    
 
   }
   
@@ -84,8 +101,11 @@ class Protocol extends EventEmitter {
 
     try {
       const currentHost = utils.currentHost()
+      console.log(currentHost)
+      console.log(data.host)
 
       if(data.host == currentHost) { 
+        console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         if(this.isRequest(data)) {
           return this.emit(CONST.REQUEST_MSG,data)
         } else {
@@ -95,14 +115,19 @@ class Protocol extends EventEmitter {
       } else {
         const hostId = this.getHostId(data.host)
 
+        console.log(hostId)
+
         if(!hostId) {
+          console.log("cannot find hostid")
           return 
         }
 
         if(utils.isRenderer()) { //渲染进程
+         
           return utils.getSender(0)?.send(CONST.RPC_MSG,data)
         } else { // 主进程
-          
+          console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
+          console.log(hostId)
           return utils.getSender(hostId)?.send(CONST.RPC_MSG,data)
         }
     }

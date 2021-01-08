@@ -59,7 +59,7 @@ class Server {
         request : request,
         data : result,
         status : 0,
-        type : CONST.REQUEST_TYPE,
+        type : CONST.RESPONSE_TYPE,
         host : request.clientHost,
         endTimestamp : new Date().getTime(),
         message: ""
